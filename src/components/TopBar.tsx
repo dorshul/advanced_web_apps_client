@@ -3,14 +3,14 @@ import { NavLink } from 'react-router-dom';
 import NewPostIcon from '@mui/icons-material/AddCircle';
 import ExploreIcon from '@mui/icons-material/Explore';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import { AppBar, Toolbar, Typography, Button, Box, Stack } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Stack } from '@mui/material';
 
 const TopBar = () => {
   const linkStyle = { textDecoration: 'none', color: 'inherit' };
   const activeStyle = { textDecoration: 'underline' };
 
   return (
-    <AppBar position="static">
+    <AppBar position="sticky">
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           Welcome!
