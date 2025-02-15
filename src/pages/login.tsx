@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -10,26 +10,25 @@ import {
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useAuth } from "../hooks/auth";
+import { useAuth, useLogin } from "../hooks/auth";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
 
 interface LoginFormInputs {
-  username: string;
+  email: string;
   password: string;
 }
 
 const loginSchema = yup.object().shape({
-  username: yup.string().required("Username is required"),
+  email: yup.string().required("Email is required"),
   password: yup.string().required("Password is required"),
 });
 
 const Login: React.FC = () => {
   const theme = useTheme();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const { mutateAsync, isPending } = useLogin();
 
   const {
     register,
@@ -40,19 +39,21 @@ const Login: React.FC = () => {
   });
 
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
-    setLoading(true);
     setErrorMessage(null);
 
     try {
-      const response = await axios.post("/api/login", data);
-      login(response.data.token);
+      const token = await mutateAsync(data);
+      login(token, data.email);
       navigate("/explore");
     } catch (error) {
-      setErrorMessage("Invalid username or password. Please try again.");
-    } finally {
-      setLoading(false);
+      console.error(error);
+      setErrorMessage("Invalid email or password. Please try again.");
     }
   };
+
+  useEffect(() => {
+    if (user) navigate("/explore");
+  }, [navigate, user]);
 
   return (
     <Box
@@ -76,13 +77,13 @@ const Login: React.FC = () => {
         )}
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <TextField
-            label="Username"
+            label="Email"
             variant="outlined"
             fullWidth
             margin="normal"
-            {...register("username")}
-            error={!!errors.username}
-            helperText={errors.username?.message}
+            {...register("email")}
+            error={!!errors.email}
+            helperText={errors.email?.message}
           />
           <TextField
             label="Password"
@@ -100,9 +101,13 @@ const Login: React.FC = () => {
             color="primary"
             fullWidth
             sx={{ mt: 2, py: 1.5 }}
-            disabled={loading}
+            disabled={isPending || isPending}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : "Login"}
+            {isPending ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Login"
+            )}
           </Button>
         </form>
 

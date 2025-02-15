@@ -1,5 +1,5 @@
-const ExploreView = () => {
+const ExplorePage = () => {
   return <h1>Explore Page</h1>;
 };
 
-export default ExploreView;
+export default ExplorePage;

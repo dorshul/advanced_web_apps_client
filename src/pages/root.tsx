@@ -18,7 +18,9 @@ export default function Root() {
     <Stack direction="column" alignItems="stretch" sx={{ height: "100%" }}>
       <AppNavbar />
       <Stack direction="row" flex={1}>
-        {isSignedIn ? <SideMenu /> : null}
+        {isSignedIn && !PUBLIC_ROUTES.includes(location.pathname) ? (
+          <SideMenu />
+        ) : null}
         <Box
           component="main"
           sx={(theme) => ({

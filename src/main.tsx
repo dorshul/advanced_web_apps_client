@@ -8,7 +8,8 @@ import AppTheme from "./theme";
 import Root from "./pages/root";
 import Login from "./pages/login";
 import { AuthProvider } from "./contexts/auth-context.jsx";
-import Registration from "./pages/register.js";
+import RegistrationPage from "./pages/register.js";
+import ExplorePage from "./pages/explore.js";
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
@@ -26,7 +27,12 @@ const router = createBrowserRouter([
       {
         id: "register",
         path: "/register",
-        element: <Registration />,
+        element: <RegistrationPage />,
+      },
+      {
+        id: "explore",
+        path: "/explore",
+        element: <ExplorePage />,
       },
     ],
   },
