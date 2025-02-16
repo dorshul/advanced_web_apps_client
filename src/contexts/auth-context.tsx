@@ -12,6 +12,7 @@ interface AuthContextType {
   login: (token: string, email: string) => void;
   logout: () => void;
   isLoading: boolean;
+  token: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

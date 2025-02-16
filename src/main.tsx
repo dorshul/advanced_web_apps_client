@@ -10,6 +10,7 @@ import Login from "./pages/login";
 import { AuthProvider } from "./contexts/auth-context.jsx";
 import RegistrationPage from "./pages/register.js";
 import ExplorePage from "./pages/explore.js";
+import PostView from "./pages/post-view.js";
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
@@ -33,6 +34,11 @@ const router = createBrowserRouter([
         id: "explore",
         path: "/explore",
         element: <ExplorePage />,
+      },
+      {
+        id: "post",
+        path: "/posts/:id",
+        element: <PostView />,
       },
     ],
   },
