@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import CommentIcon from '@mui/icons-material/Comment';
-import { Typography, CardContent, CardMedia, Card, Icon, IconButton, Stack } from '@mui/material';
+import { Typography, CardContent, CardMedia, Card, IconButton, Stack } from '@mui/material';
 
 import Post from '../types/Post';
 
@@ -12,16 +12,8 @@ type PostPreviewProps = {
 const PostPreview = ({ post }: PostPreviewProps) => {
   const { title, content } = post;
   const imageUrl = "https://picsum.photos/200/300";
-  const [likes, setLikes] = useState(0);
-  const [comments, setComments] = useState(0);
-
-  const handleLike = () => {
-    setLikes(likes + 1);
-  };
-
-  const handleComment = () => {
-    setComments(comments + 1);
-  };
+  const [likes] = useState(0);
+  const [comments] = useState(0);
   
   return (
     <Card sx={{ minWidth: 300, border: '1px solid rgb(163, 162, 165)', margin: 1 }}>

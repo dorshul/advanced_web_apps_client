@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, FormControl, InputLabel, OutlinedInput, Button, Typography, Box, Stack } from '@mui/material';
+import { FormControl, InputLabel, OutlinedInput, Button, Typography, Box, Stack } from '@mui/material';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
