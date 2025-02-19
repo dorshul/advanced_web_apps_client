@@ -1,23 +1,44 @@
-import { AccountCircle } from "@mui/icons-material";
-import Stack from "@mui/material/Stack";
 import {
+  AccountTree,
+  Explore,
+  Home,
+  ListAlt,
+  Logout,
+  ScreenLockPortrait,
+  Upload,
+} from '@mui/icons-material';
+import Stack from '@mui/material/Stack';
+import {
+  Avatar,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-} from "@mui/material";
-import { useMatches, useNavigate } from "react-router-dom";
+} from '@mui/material';
+import { useMatches, useNavigate } from 'react-router-dom';
 
 const sidebarWidth = 240;
 
 const routes = [
-  // {
-  //   id: "login",
-  //   name: "Login",
-  //   link: "/",
-  //   icon: <AccountCircle />,
-  // },
+  {
+    id: 'posts',
+    name: 'Posts',
+    link: '/posts',
+    icon: <Explore />,
+  },
+  {
+    id: 'upload',
+    name: 'Upload',
+    link: '/upload',
+    icon: <Upload />,
+  },
+  {
+    id: 'profile',
+    name: 'Profile',
+    link: '/profile',
+    icon: <ScreenLockPortrait />,
+  },
 ];
 
 export default function SideMenu() {
@@ -28,9 +49,9 @@ export default function SideMenu() {
     <Stack
       sx={{
         width: sidebarWidth,
-        backgroundColor: "background.paper",
-        borderRight: "1px solid",
-        borderColor: "divider",
+        backgroundColor: 'background.paper',
+        borderRight: '1px solid',
+        borderColor: 'divider',
       }}
     >
       <List>

@@ -1,13 +1,13 @@
-import { useContext } from "react";
-import AuthContext from "../contexts/auth-context";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useContext } from 'react';
+import AuthContext from '../contexts/auth';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import axios from "axios";
+import axios from 'axios';
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
@@ -17,14 +17,19 @@ export const useLogin = () => {
 
   return useMutation({
     mutationFn: async (credentials: { email: string; password: string }) => {
-      const { data } = await axios.post<{ token: string }>(
-        "/api/auth/login",
-        credentials
-      );
-      return data.token;
+      const { data } = await axios.post<{
+        accessToken: string;
+        refreshToken: string;
+        _id: string;
+      }>('/api/auth/login', credentials);
+      return {
+        token: data.accessToken,
+        refreshToken: data.refreshToken,
+        userId: data._id,
+      };
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["login"] });
+      queryClient.invalidateQueries({ queryKey: ['user'] });
     },
   });
 };
@@ -38,14 +43,11 @@ export const useRegister = () => {
       email: string;
       password: string;
     }) => {
-      const { data } = await axios.post<{ token: string }>(
-        "/api/auth/register",
-        credentials
-      );
-      return data.token;
+      const { data } = await axios.post('/api/auth/register', credentials);
+      return data;
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["login"] });
+      queryClient.invalidateQueries({ queryKey: ['login'] });
     },
   });
 };

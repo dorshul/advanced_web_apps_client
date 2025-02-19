@@ -1,8 +1,9 @@
 type Post = {
-  id: number;
+  _id: string;
   title: string;
   content: string;
-  imageUrl?: string;
+  sender: string;
+  imageUrl: string;
 };
 
 export default Post;

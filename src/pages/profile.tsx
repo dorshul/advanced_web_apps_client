@@ -1,67 +1,51 @@
-import React from "react";
-import PostList from "../components/PostList";
-import { Box, Button, Typography, Avatar } from "@mui/material";
+// import React, { useState, useEffect } from 'react';
+// import { useProfile, useUpdateProfile } from '../hooks/user';
 
-const ProfileView: React.FC = () => {
-  const posts = [
-    { id: 1, title: "Post 1", content: "This is the content of post 1." },
-    { id: 2, title: "Post 2", content: "This is the content of post 2." },
-    { id: 3, title: "Post 3", content: "This is the content of post 3." },
-    { id: 4, title: "Post 4", content: "This is the content of post 4." },
-    { id: 5, title: "Post 5", content: "This is the content of post 5." },
-    { id: 6, title: "Post 6", content: "This is the content of post 6." },
-    { id: 7, title: "Post 7", content: "This is the content of post 1." },
-    { id: 8, title: "Post 8", content: "This is the content of post 2." },
-    { id: 9, title: "Post 9", content: "This is the content of post 3." },
-    { id: 10, title: "Post 10", content: "This is the content of post 4." },
-  ];
+// const ProfilePage: React.FC = () => {
+//   const { data: profile, isLoading } = useProfile();
+//   const {
+//     mutate: updateProfile,
+//     isPending: isUpdating,
+//     error,
+//   } = useUpdateProfile();
+//   const [formData, setFormData] = useState({ name: '', email: '' });
 
-  const handleLogout = () => {
-    alert("Logged out!");
-  };
+//   useEffect(() => {
+//     if (profile) {
+//       setFormData({ name: profile.name, email: profile.email });
+//     }
+//   }, [profile]);
 
-  return (
-    <Box
-      sx={{
-        textAlign: "center",
-        padding: "20px",
-        backgroundColor: "#f0f0f0",
-      }}
-    >
-      <Box
-        sx={{
-          zIndex: 1,
-          top: 64,
-          backgroundColor: "#f0f0f0",
-          paddingBottom: "10px",
-        }}
-      >
-        <Avatar
-          src="/src/assets/avatar.png"
-          alt="User Avatar"
-          sx={{
-            width: "200px",
-            height: "200px",
-            margin: "0 auto",
-          }}
-        />
-        <Typography variant="h6" sx={{ marginBottom: "20px" }}>
-          Username
-        </Typography>
-      </Box>
+//   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+//   };
 
-      <PostList posts={posts} />
+//   const handleSubmit = (e: React.FormEvent) => {
+//     e.preventDefault();
+//     updateProfile(formData);
+//   };
 
-      <Button
-        variant="contained"
-        color="error"
-        sx={{ marginTop: "20px" }}
-        onClick={handleLogout}
-      >
-        Logout
-      </Button>
-    </Box>
-  );
-};
+//   if (isLoading) return <div>Loading profile...</div>;
 
-export default ProfileView;
+//   return (
+//     <div>
+//       <h1>Update Profile</h1>
+//       {error && <div>Error updating profile</div>}
+//       <form onSubmit={handleSubmit}>
+//         <div>
+//           <label>Name:</label>
+//           <input name="name" value={formData.name} onChange={handleChange} />
+//         </div>
+//         <div>
+//           <label>Email:</label>
+//           <input name="email" value={formData.email} onChange={handleChange} />
+//         </div>
+//         <button type="submit" disabled={isUpdating}>
+//           Update Profile
+//         </button>
+//       </form>
+//     </div>
+//   );
+// };
+
+// export default ProfilePage;
