@@ -3,7 +3,7 @@ import { usePosts } from '../hooks/posts';
 import Post from '../components/post';
 
 const PostsView: React.FC = () => {
-  const { data: posts, isLoading, error } = usePosts();
+  const { data: posts, isLoading, error } = usePosts({});
 
   if (isLoading) return <p>Loading posts...</p>;
   if (error) return <p>Error loading posts</p>;

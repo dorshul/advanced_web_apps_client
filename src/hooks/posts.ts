@@ -1,13 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
-import Post from '../types/posts';
-import { useAuth } from './auth';
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import Post from "../types/posts";
+import { useAuth } from "./auth";
 
-export const fetchPosts = async (token: string): Promise<Post[]> => {
-  const { data } = await axios.get('/api/posts', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+export const fetchPosts = async (query: Partial<Post>): Promise<Post[]> => {
+  const { data } = await axios.get("/api/posts", {
+    params: query,
   });
   return data;
 };
@@ -21,22 +19,22 @@ export const fetchPost = async (token: string, id: string): Promise<Post> => {
   return data;
 };
 
-export const usePosts = () => {
+export const usePosts = (query: Partial<Post>) => {
   const { token } = useAuth();
-  if (!token) throw new Error('No Auth !');
+  if (!token) throw new Error("No Auth !");
 
   return useQuery<Post[]>({
-    queryKey: ['posts'],
-    queryFn: () => fetchPosts(token),
+    queryKey: ["posts"],
+    queryFn: () => fetchPosts(query),
   });
 };
 
 export const usePost = (id: string) => {
   const { token } = useAuth();
-  if (!token) throw new Error('No Auth !');
+  if (!token) throw new Error("No Auth !");
 
   return useQuery<Post>({
-    queryKey: ['post', id],
+    queryKey: ["post", id],
     queryFn: () => fetchPost(token, id),
   });
 };

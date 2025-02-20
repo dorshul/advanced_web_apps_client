@@ -10,7 +10,7 @@ import Login from "./pages/login";
 import { AuthProvider } from "./contexts/auth";
 import ExplorePage from "./pages/explore";
 import PostsDetailsPage from "./pages/post-details";
-import PostsView from "./pages/posts";
+import ProfilePage from "./pages/profile";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -21,12 +21,11 @@ const router = createBrowserRouter([
     path: "/",
     element: <Root />,
     children: [
-      // {
-      //   id: 'profile',
-      //   path: '/profile',
-      //   element: <ProfilePage />,
-      // },
-
+      {
+        id: 'profile',
+        path: '/profile',
+        element: <ProfilePage />,
+      },
       {
         id: "login",
         path: "/login",
@@ -36,11 +35,6 @@ const router = createBrowserRouter([
         id: "explore",
         path: "/explore",
         element: <ExplorePage />,
-      },
-      {
-        id: "posts",
-        path: "/posts",
-        element: <PostsView />,
       },
       {
         id: "post-details",

@@ -7,9 +7,9 @@ const sidebarWidth = 240;
 
 const routes = [
   {
-    id: 'posts',
-    name: 'Posts',
-    link: '/posts',
+    id: 'explored',
+    name: 'Explore',
+    link: '/explore',
     icon: <Explore />,
   },
   {

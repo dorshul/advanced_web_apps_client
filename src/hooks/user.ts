@@ -1,7 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
-import { useAuth } from './auth';
-import { User } from '../contexts/auth';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { useAuth } from "./auth";
+import { User } from "../contexts/auth";
 
 export const fetchUser = async (
   token: string,
@@ -17,7 +17,9 @@ export const updateUser = async (
   token: string,
   userData: Partial<User>
 ): Promise<User> => {
-  const { data } = await axios.put(`/api/users/${userData._id}`, userData, {
+  const userId = userData._id;
+  delete userData._id;
+  const { data } = await axios.put(`/api/users/${userId}`, userData, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return data;
@@ -25,11 +27,11 @@ export const updateUser = async (
 
 export const useUser = () => {
   const { token, user } = useAuth();
-  if (!token) throw new Error('No auth token available');
-  if (!user) throw new Error('No user available');
+  if (!token) throw new Error("No auth token available");
+  if (!user) throw new Error("No user available");
 
   return useQuery<User>({
-    queryKey: ['user'],
+    queryKey: ["user"],
     queryFn: () => fetchUser(token, user._id),
   });
 };
@@ -37,13 +39,13 @@ export const useUser = () => {
 export const useUpdateUser = () => {
   const { token, user } = useAuth();
   const queryClient = useQueryClient();
-  if (!token) throw new Error('No auth token available');
-  if (!user) throw new Error('No user token available');
+  if (!token) throw new Error("No auth token available");
+  if (!user) throw new Error("No user token available");
 
   return useMutation({
     mutationFn: (data: Partial<User>) => updateUser(token, data),
     onSuccess: (data) => {
-      queryClient.setQueryData(['user'], data);
+      queryClient.setQueryData(["user"], data);
     },
   });
 };
