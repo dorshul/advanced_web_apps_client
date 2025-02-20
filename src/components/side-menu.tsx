@@ -1,21 +1,6 @@
-import {
-  AccountTree,
-  Explore,
-  Home,
-  ListAlt,
-  Logout,
-  ScreenLockPortrait,
-  Upload,
-} from '@mui/icons-material';
+import { Explore, ScreenLockPortrait, Upload } from '@mui/icons-material';
 import Stack from '@mui/material/Stack';
-import {
-  Avatar,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-} from '@mui/material';
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useMatches, useNavigate } from 'react-router-dom';
 
 const sidebarWidth = 240;
