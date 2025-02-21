@@ -1,4 +1,4 @@
-import PostList from "../components/posts-list";
+import PostList from "../components/posts/posts-list";
 import { usePosts } from "../hooks/posts";
 
 const ExplorePage = () => {
@@ -8,7 +8,7 @@ const ExplorePage = () => {
   if (error) return <p>Error loading posts</p>;
 
   return (
-    <div>
+    <div style={{ maxWidth: "150vh", margin: "0 auto" }}>
       <PostList posts={posts || []} />
     </div>
   );

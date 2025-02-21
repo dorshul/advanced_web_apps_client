@@ -1,11 +1,11 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import { usePost } from '../hooks/posts';
-import Post from '../components/post';
+import React from "react";
+import { useParams } from "react-router-dom";
+import { usePost } from "../hooks/posts";
+import Post from "../components/posts/post-details";
 
 const PostDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  if (!id) throw new Error('No id');
+  if (!id) throw new Error("No id");
 
   const { data: post, isLoading, error } = usePost(id);
 

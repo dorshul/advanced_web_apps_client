@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Post from "../types/posts";
 import { useAuth } from "./auth";
@@ -36,5 +36,26 @@ export const usePost = (id: string) => {
   return useQuery<Post>({
     queryKey: ["post", id],
     queryFn: () => fetchPost(token, id),
+  });
+};
+
+export const createPost = async (token: string, post: Partial<Post>) => {
+  const { data } = await axios.post("/api/posts", post, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return data;
+};
+
+export const useCreatePost = () => {
+  const { token, user } = useAuth();
+  if (!token) throw new Error("No Auth !");
+  if (!user) throw new Error("No User !");
+
+  return useMutation({
+    mutationKey: ["createPost"],
+    mutationFn: (post: Partial<Post>) =>
+      createPost(token, { ...post, sender: user._id }),
   });
 };

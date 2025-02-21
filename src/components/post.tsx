@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { useComments, useAddComment } from '../hooks/comments';
-import Post from '../types/posts';
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { useComments, useAddComment } from "../hooks/comments";
+import Post from "../types/posts";
+import { Link } from "react-router-dom";
 
 interface PostProps {
   post: Post;
@@ -12,20 +12,20 @@ const PostComponent: React.FC<PostProps> = ({ post }) => {
   const { mutateAsync: addCommentMutation, isPending } = useAddComment(
     post._id
   );
-  const [commentText, setCommentText] = useState('');
+  const [commentText, setCommentText] = useState("");
 
   const handleAddComment = () => {
     if (!commentText.trim()) return;
     addCommentMutation(commentText);
-    setCommentText('');
+    setCommentText("");
   };
 
   return (
     <div
       style={{
-        border: '1px solid #ccc',
-        marginBottom: '1rem',
-        padding: '1rem',
+        border: "1px solid #ccc",
+        marginBottom: "1rem",
+        padding: "1rem",
       }}
     >
       <Link to={`/posts/${post._id}`}>
@@ -35,7 +35,7 @@ const PostComponent: React.FC<PostProps> = ({ post }) => {
         <img
           src={post.imageUrl}
           alt={post.title}
-          style={{ maxWidth: '100%' }}
+          style={{ maxWidth: "100%" }}
         />
       )}
       <p>{post.content}</p>

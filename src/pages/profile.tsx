@@ -1,25 +1,18 @@
-import { Box } from '@mui/material';
+import { Box } from "@mui/material";
 
-import { useUser } from '../hooks/user';
-import PostList from '../components/posts-list';
-import { usePosts } from '../hooks/posts';
-import UserDetails from '../components/user-details';
+import UserDetails from "../components/user-details";
+import UserPostsView from "./user-posts";
 
 const ProfilePage: React.FC = () => {
-  const { data: profile, isLoading } = useUser();
-  const { data: userPosts, isLoading: isLoadingPosts } = usePosts({ sender: profile?._id });
-
-  if (isLoading) return <div>Loading profile...</div>;
-
   return (
     <Box
       sx={{
-        textAlign: 'center',
-        padding: '20px',
+        textAlign: "center",
+        padding: "20px",
       }}
     >
-      {!isLoading && <UserDetails/>}
-      {!isLoadingPosts && <PostList posts={userPosts || []} />}
+      <UserDetails />
+      <UserPostsView />
     </Box>
   );
 };

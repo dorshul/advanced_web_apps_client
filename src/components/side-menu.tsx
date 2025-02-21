@@ -1,27 +1,33 @@
-import { Explore, ScreenLockPortrait, Upload } from '@mui/icons-material';
-import Stack from '@mui/material/Stack';
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { useMatches, useNavigate } from 'react-router-dom';
+import { Explore, ScreenLockPortrait, Upload } from "@mui/icons-material";
+import Stack from "@mui/material/Stack";
+import {
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
+import { useMatches, useNavigate } from "react-router-dom";
 
-const sidebarWidth = 240;
+const sidebarWidth = "30vh";
 
 const routes = [
   {
-    id: 'explored',
-    name: 'Explore',
-    link: '/explore',
+    id: "explored",
+    name: "Explore",
+    link: "/explore",
     icon: <Explore />,
   },
   {
-    id: 'upload',
-    name: 'Upload',
-    link: '/upload',
+    id: "upload",
+    name: "Upload",
+    link: "/upload",
     icon: <Upload />,
   },
   {
-    id: 'profile',
-    name: 'Profile',
-    link: '/profile',
+    id: "profile",
+    name: "Profile",
+    link: "/profile",
     icon: <ScreenLockPortrait />,
   },
 ];
@@ -34,9 +40,10 @@ export default function SideMenu() {
     <Stack
       sx={{
         width: sidebarWidth,
-        backgroundColor: 'background.paper',
-        borderRight: '1px solid',
-        borderColor: 'divider',
+        height: "100vh",
+        backgroundColor: "background.paper",
+        borderRight: "1px solid",
+        borderColor: "divider",
       }}
     >
       <List>
