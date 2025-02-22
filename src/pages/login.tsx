@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -6,12 +6,12 @@ import {
   Typography,
   useTheme,
   CircularProgress,
-} from '@mui/material';
-import { useForm, SubmitHandler } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import { useAuth, useLogin } from '../hooks/auth';
-import { useNavigate, Link } from 'react-router-dom';
+} from "@mui/material";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { useAuth, useLogin } from "../hooks/auth";
+import { useNavigate, Link } from "react-router-dom";
 
 interface LoginFormInputs {
   email: string;
@@ -19,8 +19,8 @@ interface LoginFormInputs {
 }
 
 const loginSchema = yup.object().shape({
-  email: yup.string().required('Email is required'),
-  password: yup.string().required('Password is required'),
+  email: yup.string().required("Email is required"),
+  password: yup.string().required("Password is required"),
 });
 
 const Login: React.FC = () => {
@@ -44,30 +44,29 @@ const Login: React.FC = () => {
     try {
       const response = await attemptLogin(data);
       login(response.token, response.refreshToken, response.userId);
-      navigate('/explore', { replace: true });
+      navigate("/explore", { replace: true });
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error(error);
-      setErrorMessage('Invalid email or password. Please try again.');
+      setErrorMessage("Invalid email or password. Please try again.");
     }
   };
 
   useEffect(() => {
-    if (user) navigate('/explore');
+    if (user) navigate("/explore");
   }, [navigate, user]);
 
   return (
     <Box
       sx={{
         backgroundColor: theme.palette.background.default,
-        minHeight: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
         p: 2,
       }}
     >
-      <Box sx={{ width: '100%', maxWidth: 400, textAlign: 'center' }}>
+      <Box sx={{ width: "100%", maxWidth: 400, textAlign: "center" }}>
         <Typography variant="h4" gutterBottom>
           Login
         </Typography>
@@ -82,7 +81,7 @@ const Login: React.FC = () => {
             variant="outlined"
             fullWidth
             margin="normal"
-            {...register('email')}
+            {...register("email")}
             error={!!errors.email}
             helperText={errors.email?.message}
           />
@@ -92,7 +91,7 @@ const Login: React.FC = () => {
             type="password"
             fullWidth
             margin="normal"
-            {...register('password')}
+            {...register("password")}
             error={!!errors.password}
             helperText={errors.password?.message}
           />
@@ -107,17 +106,17 @@ const Login: React.FC = () => {
             {isPending ? (
               <CircularProgress size={24} color="inherit" />
             ) : (
-              'Login'
+              "Login"
             )}
           </Button>
         </form>
 
         <Typography variant="body2" sx={{ mt: 2 }}>
-          Don't have an account?{' '}
+          Don't have an account?{" "}
           <Link
             to="/register"
             style={{
-              textDecoration: 'none',
+              textDecoration: "none",
               color: theme.palette.primary.main,
             }}
           >

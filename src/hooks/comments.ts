@@ -49,7 +49,7 @@ export const useComments = (postId: string) => {
   return useQuery<Comment[]>({
     queryKey: ["comments", postId],
     queryFn: () => fetchComments(token, postId),
-    enabled: !!postId,
+    enabled: !!postId && postId !== "",
   });
 };
 
