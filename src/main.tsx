@@ -6,12 +6,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import Root from "./pages/root";
 import AppTheme from "./theme";
-import Login from "./pages/login";
-import { AuthProvider } from "./contexts/auth";
+import { Login } from "./pages/login";
 import ExplorePage from "./pages/explore";
 import PostsDetailsPage from "./pages/post-details";
 import PostsView from "./pages/user-posts";
-import RegisterPage from "./pages/register";
+import { Register } from "./pages/register";
 import ProfilePage from "./pages/profile";
 import UploadPostPage from "./pages/upload";
 
@@ -52,7 +51,7 @@ const router = createBrowserRouter([
       {
         id: "register",
         path: "/register",
-        element: <RegisterPage />,
+        element: <Register />,
       },
       {
         id: "upload",
@@ -68,14 +67,12 @@ const queryClient = new QueryClient();
 root.render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <StyledEngineProvider injectFirst>
-          <AppTheme>
-            <CssBaseline enableColorScheme />
-            <RouterProvider router={router} />
-          </AppTheme>
-        </StyledEngineProvider>
-      </AuthProvider>
+      <StyledEngineProvider injectFirst>
+        <AppTheme>
+          <CssBaseline enableColorScheme />
+          <RouterProvider router={router} />
+        </AppTheme>
+      </StyledEngineProvider>
     </QueryClientProvider>
   </StrictMode>
 );

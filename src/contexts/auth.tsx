@@ -1,116 +1,95 @@
-import React, {
-  createContext,
-  ReactNode,
-  useState,
-  useEffect,
-  useCallback,
-} from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
-import Cookies from 'js-cookie';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios, { AxiosResponse } from "axios";
 
-export interface User {
+interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+interface RegisterCredentials extends LoginCredentials {
   name: string;
   email: string;
-  _id: string;
-  imageUrl?: string;
+  password: string;
 }
 
-interface AuthContextType {
-  user: User | null | undefined;
-  token: string | null;
-  login: (accessToken: string, refreshToken: string, userId: string) => void;
-  logout: () => void;
-  refresh: () => Promise<string | undefined>;
-  isLoading: boolean;
-}
+import { axiosInstance } from "../services/axios.ts";
+import { useEffect } from "react";
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const useAuth = () => {
   const queryClient = useQueryClient();
-  const [token, setToken] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-
-  const userId = Cookies.get('userId');
-
-  const { data: fetchedUser, isLoading } = useQuery<User | null>({
-    queryKey: ['user'],
-    queryFn: async () => {
-      if (!token || !userId) return null;
-      const response = await axios.get(`/api/users/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUser(response.data);
-      return response.data;
-    },
-    enabled: !!token && !!userId,
-    retry: false,
-    staleTime: 5 * 60 * 1000,
-  });
 
   useEffect(() => {
-    if (fetchedUser) {
-      setUser(fetchedUser);
-    }
-  }, [fetchedUser]);
+    const interceptor = axiosInstance.interceptors.response.use(
+      (response: AxiosResponse) => response,
+      async (error) => {
+        if (error.response?.status === 401) {
+          try {
+            const { data } = await axios.post(
+              "/api/auth/refresh",
+              {},
+              {
+                withCredentials: true,
+              }
+            );
+            axiosInstance.defaults.headers.common[
+              "Authorization"
+            ] = `Bearer ${data.accessToken}`;
+            return axiosInstance(error.config);
+          } catch {
+            queryClient.setQueryData(["user"], null);
+            return Promise.reject(error);
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
 
-  const login = (accessToken: string, refreshToken: string, userId: string) => {
-    Cookies.set('userId', userId);
-    Cookies.set('refreshToken', refreshToken, { expires: 7 });
-    queryClient.invalidateQueries({ queryKey: ['user'] });
-    setToken(accessToken);
-  };
-
-  const logout = useCallback(() => {
-    setToken(null);
-    setUser(null);
-    Cookies.remove('refreshToken');
-    Cookies.remove('userId');
-    Cookies.remove('accessToken');
-    queryClient.setQueryData(['user'], null);
+    return () => axiosInstance.interceptors.response.eject(interceptor);
   }, [queryClient]);
 
-  const refresh = useCallback(async (): Promise<string | undefined> => {
-    try {
-      const refreshToken = Cookies.get('refreshToken');
-      const response = await axios.post<{
-        accessToken: string;
-        refreshToken: string;
-      }>('/api/auth/refresh', { refreshToken }, { withCredentials: true });
-      const newAccessToken = response.data.accessToken;
-      Cookies.set('refreshToken', response.data.refreshToken, {
-        expires: 1 / 24,
+  const loginMutation = useMutation({
+    mutationFn: async (credentials: LoginCredentials) => {
+      const { data } = await axiosInstance.post("/api/auth/login", credentials);
+      axiosInstance.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${data.accessToken}`;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["user"], data.user);
+    },
+  });
+  const registerMutation = useMutation({
+    mutationFn: async (credentials: RegisterCredentials) => {
+      const { data } = await axios.post("/api/auth/register", credentials, {
+        withCredentials: true,
       });
-      setToken(newAccessToken);
-      queryClient.invalidateQueries({ queryKey: ['user'] });
-      return newAccessToken;
-    } catch (error) {
-      logout();
-      return undefined;
-    }
-  }, [logout, queryClient]);
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["user"], data.user);
+    },
+  });
 
-  useEffect(() => {
-    if (token) {
-      const interval = setInterval(() => {
-        refresh();
-      }, 5 * 60 * 1000);
-      return () => clearInterval(interval);
-    }
-  }, [refresh, token]);
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      await axios.post("/api/auth/logout", {}, { withCredentials: true });
+    },
+    onSuccess: () => {
+      queryClient.setQueryData(["user"], null);
+      queryClient.clear();
+    },
+  });
 
-  return (
-    <AuthContext.Provider
-      value={{ user, login, logout, refresh, isLoading, token }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  return {
+    login: loginMutation.mutateAsync,
+    register: registerMutation.mutateAsync,
+    logout: logoutMutation.mutateAsync,
+    isLoading:
+      loginMutation.isPending ||
+      registerMutation.isPending ||
+      logoutMutation.isPending,
+    error:
+      loginMutation.error || registerMutation.error || logoutMutation.error,
+  };
 };
-
-export default AuthContext;

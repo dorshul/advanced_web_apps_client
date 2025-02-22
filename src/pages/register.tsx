@@ -1,117 +1,133 @@
-import React, { useState } from "react";
-import { Box, Button, TextField, Typography, Stack, Link } from "@mui/material";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
-import axios, { AxiosError } from "axios";
+import { z } from "zod";
+import { useAuth } from "../contexts/auth";
+import {
+  Paper,
+  TextField,
+  Button,
+  Typography,
+  Container,
+  Box,
+  CircularProgress,
+  Grid,
+} from "@mui/material";
 
-const RegisterPage: React.FC = () => {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
+const registerSchema = z
+  .object({
+    name: z.string().min(2, "Name must be at least 2 characters"),
+    email: z.string().email("Invalid email"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
   });
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+type RegisterForm = z.infer<typeof registerSchema>;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-    setIsLoading(true);
-    setError("");
+export const Register = () => {
+  const navigate = useNavigate();
+  const { register: registerUser } = useAuth();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterForm>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  const onSubmit = async (data: RegisterForm) => {
     try {
-      await axios.post("/api/auth/register", {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
+      await registerUser({
+        name: data.name,
+        email: data.email,
+        password: data.password,
       });
-      navigate("/login");
-    } catch (err: unknown) {
-      if (err instanceof AxiosError)
-        setError(err.response?.data?.message || "Registration failed");
-      else if (err instanceof Error) setError(err.message);
-      else setError("Unknown error");
-    } finally {
-      setIsLoading(false);
+      navigate("/explore");
+    } catch (err) {
+      console.error("Registration failed:", err);
     }
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "100vh",
-      }}
-    >
-      <Stack
-        spacing={2}
-        sx={{ width: "100%", maxWidth: 400, p: 3, boxShadow: 2 }}
+    <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          marginTop: 8,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
       >
-        <Typography variant="h4" component="h1" align="center">
-          Register
-        </Typography>
-        {error && <Typography color="error">{error}</Typography>}
-        <form onSubmit={handleSubmit}>
-          <Stack spacing={2}>
-            <TextField
-              label="Name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-            <TextField
-              label="Email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-            <TextField
-              label="Password"
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-            <TextField
-              label="Confirm Password"
-              name="confirmPassword"
-              type="password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required
-            />
-            <Button variant="contained" type="submit" disabled={isLoading}>
-              {isLoading ? "Registering..." : "Register"}
+        <Paper elevation={3} sx={{ p: 4, width: "100%" }}>
+          <Typography component="h1" variant="h5" align="center" gutterBottom>
+            Create Account
+          </Typography>
+
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Name"
+                  {...register("name")}
+                  error={!!errors.name}
+                  helperText={errors.name?.message}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Email"
+                  {...register("email")}
+                  error={!!errors.email}
+                  helperText={errors.email?.message}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Password"
+                  type="password"
+                  {...register("password")}
+                  error={!!errors.password}
+                  helperText={errors.password?.message}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Confirm Password"
+                  type="password"
+                  {...register("confirmPassword")}
+                  error={!!errors.confirmPassword}
+                  helperText={errors.confirmPassword?.message}
+                />
+              </Grid>
+            </Grid>
+
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "Register"
+              )}
             </Button>
-            <Typography variant="body2" align="center">
-              Already have an account?{" "}
-              <Link
-                component="button"
-                variant="body2"
-                onClick={() => navigate("/login")}
-              >
-                Login
-              </Link>
-            </Typography>
-          </Stack>
-        </form>
-      </Stack>
-    </Box>
+          </form>
+        </Paper>
+      </Box>
+    </Container>
   );
 };
-
-export default RegisterPage;

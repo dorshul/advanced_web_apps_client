@@ -1,9 +1,14 @@
 import { Box } from "@mui/material";
 
 import UserDetails from "../components/user-details";
-import UserPostsView from "./user-posts";
+import PostList from "../components/posts/posts-list";
+import { useUser } from "../hooks/user";
+import { usePosts } from "../hooks/posts";
 
 const ProfilePage: React.FC = () => {
+  const { user } = useUser();
+  const { data: posts } = usePosts({ sender: user?._id });
+
   return (
     <Box
       sx={{
@@ -12,7 +17,7 @@ const ProfilePage: React.FC = () => {
       }}
     >
       <UserDetails />
-      <UserPostsView />
+      <PostList posts={posts || []} />
     </Box>
   );
 };

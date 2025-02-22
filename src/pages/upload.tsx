@@ -116,6 +116,7 @@ const UploadPostPage: React.FC = () => {
               />
             )}
           />
+          {/* TODO - Add image upload with file*/}
           <Controller
             name="imageUrl"
             control={control}
@@ -150,7 +151,6 @@ const UploadPostPage: React.FC = () => {
           <Button type="submit" variant="contained" disabled={isPending}>
             {isPending ? "Uploading..." : "Upload Post"}
           </Button>
-          {/* TODO - Add tooltip with explanation */}
           <Button
             type="button"
             variant="contained"

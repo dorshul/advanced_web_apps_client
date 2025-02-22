@@ -1,7 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "./auth";
-import { User } from "../contexts/auth";
-import axios from "axios";
+import { axiosInstance as axios } from "../services/axios";
 
 export interface Comment {
   _id: string;
@@ -10,59 +8,39 @@ export interface Comment {
   postId: string;
 }
 
-export const fetchComments = async (
-  token: string,
-  postId: string
-): Promise<Comment[]> => {
-  const { data } = await axios.get(`/api/comments?postId=${postId}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+export const fetchComments = async (postId: string): Promise<Comment[]> => {
+  const { data } = await axios.get(`/api/comments?postId=${postId}`);
   return data || [];
 };
 
 export const addComment = async (
-  token: string,
-  commentData: { postId: string; content: string },
-  user: User
+  commentData: {
+    postId: string;
+    content: string;
+  },
+  user: { email: string }
 ): Promise<Comment> => {
-  const { data } = await axios.post(
-    "/api/comments",
-    {
-      ...commentData,
-      sender: user.email,
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  const { data } = await axios.post("/api/comments", {
+    ...commentData,
+    sender: user.email,
+  });
   return data;
 };
 
 export const useComments = (postId: string) => {
-  const { token } = useAuth();
-  if (!token) throw new Error("Token is not defined");
-
   return useQuery<Comment[]>({
     queryKey: ["comments", postId],
-    queryFn: () => fetchComments(token, postId),
+    queryFn: () => fetchComments(postId),
     enabled: !!postId && postId !== "",
   });
 };
 
 export const useAddComment = (postId: string) => {
   const queryClient = useQueryClient();
-  const { user, token } = useAuth();
-  if (!token) throw new Error("Token is not defined");
-
-  if (!user) throw new Error("User is not defined");
 
   return useMutation({
     mutationFn: (content: string) =>
-      addComment(token, { postId, content }, user),
+      addComment({ postId, content }, { email: "spam email" }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
     },

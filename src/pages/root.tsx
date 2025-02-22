@@ -3,16 +3,13 @@ import SideMenu from "../components/side-menu";
 import AppNavbar from "../components/app-navbar";
 import { Outlet } from "react-router-dom";
 import Header from "../components/header";
-import { useAuth } from "../hooks/auth";
 
 export default function Root() {
-  const { user } = useAuth();
-
   return (
     <Stack direction="column" alignItems="stretch" sx={{ height: "100%" }}>
       <AppNavbar />
       <Stack direction="row" flex={1}>
-        {user ? <SideMenu /> : null}
+        {<SideMenu />}
         <Box
           component="main"
           sx={(theme) => ({

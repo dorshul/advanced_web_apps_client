@@ -1,131 +1,96 @@
-import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from "react-router-dom";
+import { z } from "zod";
+import { useAuth } from "../contexts/auth";
 import {
-  Box,
-  Button,
+  Paper,
   TextField,
+  Button,
   Typography,
-  useTheme,
+  Container,
+  Box,
   CircularProgress,
 } from "@mui/material";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { useAuth, useLogin } from "../hooks/auth";
-import { useNavigate, Link } from "react-router-dom";
 
-interface LoginFormInputs {
-  email: string;
-  password: string;
-}
-
-const loginSchema = yup.object().shape({
-  email: yup.string().required("Email is required"),
-  password: yup.string().required("Password is required"),
+const loginSchema = z.object({
+  email: z.string().email("Invalid email"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
-const Login: React.FC = () => {
-  const theme = useTheme();
-  const { login, user } = useAuth();
-  const navigate = useNavigate();
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { mutateAsync: attemptLogin, isPending } = useLogin();
+type LoginForm = z.infer<typeof loginSchema>;
 
+export const Login = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormInputs>({
-    resolver: yupResolver(loginSchema),
+    formState: { errors, isSubmitting },
+  } = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
-    setErrorMessage(null);
-
+  const onSubmit = async (data: LoginForm) => {
     try {
-      const response = await attemptLogin(data);
-      login(response.token, response.refreshToken, response.userId);
-      navigate("/explore", { replace: true });
-    } catch (error) {
-      console.error(error);
-      setErrorMessage("Invalid email or password. Please try again.");
+      await login(data);
+      navigate("/explore");
+    } catch (err) {
+      console.error("Login failed:", err);
     }
   };
 
-  useEffect(() => {
-    if (user) navigate("/explore");
-  }, [navigate, user]);
-
   return (
-    <Box
-      sx={{
-        backgroundColor: theme.palette.background.default,
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        p: 2,
-      }}
-    >
-      <Box sx={{ width: "100%", maxWidth: 400, textAlign: "center" }}>
-        <Typography variant="h4" gutterBottom>
-          Login
-        </Typography>
-        {errorMessage && (
-          <Typography color="error" sx={{ mb: 2 }}>
-            {errorMessage}
+    <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          marginTop: 8,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Paper elevation={3} sx={{ p: 4, width: "100%" }}>
+          <Typography component="h1" variant="h5" align="center" gutterBottom>
+            Welcome Back
           </Typography>
-        )}
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <TextField
-            label="Email"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            {...register("email")}
-            error={!!errors.email}
-            helperText={errors.email?.message}
-          />
-          <TextField
-            label="Password"
-            variant="outlined"
-            type="password"
-            fullWidth
-            margin="normal"
-            {...register("password")}
-            error={!!errors.password}
-            helperText={errors.password?.message}
-          />
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{ mt: 2, py: 1.5 }}
-            disabled={isPending || isPending}
-          >
-            {isPending ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : (
-              "Login"
-            )}
-          </Button>
-        </form>
 
-        <Typography variant="body2" sx={{ mt: 2 }}>
-          Don't have an account?{" "}
-          <Link
-            to="/register"
-            style={{
-              textDecoration: "none",
-              color: theme.palette.primary.main,
-            }}
-          >
-            Register here
-          </Link>
-        </Typography>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <TextField
+              margin="normal"
+              fullWidth
+              label="Email"
+              {...register("email")}
+              error={!!errors.email}
+              helperText={errors.email?.message}
+            />
+
+            <TextField
+              margin="normal"
+              fullWidth
+              label="Password"
+              type="password"
+              {...register("password")}
+              error={!!errors.password}
+              helperText={errors.password?.message}
+            />
+
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "Login"
+              )}
+            </Button>
+          </form>
+        </Paper>
       </Box>
-    </Box>
+    </Container>
   );
 };
-
-export default Login;

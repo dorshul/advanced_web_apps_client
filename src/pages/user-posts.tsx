@@ -1,18 +1,17 @@
 import React from "react";
 import { usePosts } from "../hooks/posts";
 import Post from "../components/post";
-import { useAuth } from "../hooks/auth";
+import { useUser } from "../hooks/user";
 
 const UserPostsView: React.FC = () => {
-  const { user: profile } = useAuth();
+  const { user } = useUser();
   const {
     data: userPosts,
     isLoading: isLoadingPosts,
     isError,
   } = usePosts({
-    sender: profile?._id,
+    sender: user?._id,
   });
-
   if (isLoadingPosts) return <p>Loading posts...</p>;
   if (isError) return <p>Error loading posts</p>;
 
