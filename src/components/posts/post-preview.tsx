@@ -1,4 +1,3 @@
-import { useState } from "react";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CommentIcon from "@mui/icons-material/Comment";
 import {
@@ -19,12 +18,13 @@ type PostPreviewProps = {
   disabled?: boolean;
 };
 
-const PostPreview = ({ post, disabled = true }: PostPreviewProps) => {
-  const { data: comments, isLoading: loadingComments } = useComments(post._id);
+const PostPreview = ({ post, disabled = false }: PostPreviewProps) => {
+  const { data: comments, isLoading: isCommentsLoading } = useComments(
+    post._id
+  );
 
   const { title, content } = post;
   const imageUrl = post.imageUrl || "https://picsum.photos/200/300";
-  const [likes] = useState(0);
   const navigate = useNavigate();
 
   return (
@@ -52,7 +52,7 @@ const PostPreview = ({ post, disabled = true }: PostPreviewProps) => {
           <IconButton disabled color="primary">
             <FavoriteIcon />
           </IconButton>
-          <Typography variant="body2">{likes}</Typography>
+          <Typography variant="body2">{post.likes}</Typography>
         </Stack>
 
         <Stack direction={"row"} gap={1} alignItems={"center"} margin={1}>
@@ -60,7 +60,7 @@ const PostPreview = ({ post, disabled = true }: PostPreviewProps) => {
             <CommentIcon />
           </IconButton>
           <Typography variant="body2">
-            {loadingComments ? "Loading..." : comments?.length}
+            {isCommentsLoading ? "Loading..." : comments?.length}
           </Typography>
         </Stack>
       </Stack>

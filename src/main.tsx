@@ -10,7 +10,7 @@ import Login from "./pages/login";
 import { AuthProvider } from "./contexts/auth";
 import ExplorePage from "./pages/explore";
 import PostsDetailsPage from "./pages/post-details";
-import PostsView from "./pages/posts";
+import PostsView from "./pages/user-posts";
 import RegisterPage from "./pages/register";
 import ProfilePage from "./pages/profile";
 import UploadPostPage from "./pages/upload";

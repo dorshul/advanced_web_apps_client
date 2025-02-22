@@ -4,6 +4,7 @@ type Post = {
   content: string;
   sender: string;
   imageUrl: string;
+  likes: number;
 };
 
 export default Post;

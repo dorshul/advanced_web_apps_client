@@ -48,6 +48,20 @@ export const createPost = async (token: string, post: Partial<Post>) => {
   return data;
 };
 
+export const getImageSuggestion = async (token: string, imageUrl: string) => {
+  const { data } = await axios.post<Suggestions | undefined>(
+    "/api/posts/image",
+    { imageUrl },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return data;
+};
+
 export const useCreatePost = () => {
   const { token, user } = useAuth();
   if (!token) throw new Error("No Auth !");
@@ -57,5 +71,23 @@ export const useCreatePost = () => {
     mutationKey: ["createPost"],
     mutationFn: (post: Partial<Post>) =>
       createPost(token, { ...post, sender: user._id }),
+  });
+};
+interface Suggestions {
+  title: string;
+  content: string;
+}
+
+export const useGetPostSuggestions = (imageUrl: string | null) => {
+  const { token } = useAuth();
+  if (!token) throw new Error("No Auth !");
+
+  return useQuery({
+    queryKey: ["postSuggestions", imageUrl],
+    queryFn: () =>
+      imageUrl
+        ? getImageSuggestion(token, imageUrl)
+        : Promise.resolve(undefined),
+    enabled: !!imageUrl,
   });
 };

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useComments, useAddComment } from "../../hooks/comments";
 import PostType from "../../types/posts";
+import { useAddLike } from "../../hooks/likes";
 
 interface PostProps {
   post: PostType;
@@ -11,8 +12,9 @@ const Post: React.FC<PostProps> = ({ post }) => {
   const { mutateAsync: addCommentMutation, isPending } = useAddComment(
     post._id
   );
+  const { mutateAsync: addLikeMutation } = useAddLike(post._id);
+
   const [commentText, setCommentText] = useState("");
-  const [likes, setLikes] = useState(0);
 
   const handleAddComment = () => {
     if (!commentText.trim()) return;
@@ -21,7 +23,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
   };
 
   const handleLike = () => {
-    setLikes((prev) => prev + 1);
+    addLikeMutation();
   };
 
   return (
@@ -49,7 +51,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
         />
       }
       {post.content && <p>{post.content}</p>}
-      <button onClick={handleLike}>Like ({likes})</button>
+      <button onClick={handleLike}> Like ({post.likes}) </button>
       <div style={{ marginTop: "1rem" }}>
         {commentsLoading ? (
           <p>Loading comments...</p>

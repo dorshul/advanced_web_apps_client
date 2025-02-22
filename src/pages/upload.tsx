@@ -1,9 +1,9 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Box, Button, TextField, Typography, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import PostPreview from "../components/posts/post-preview";
-import { useCreatePost } from "../hooks/posts";
+import { useCreatePost, useGetPostSuggestions } from "../hooks/posts";
 
 const UploadPostPage: React.FC = () => {
   const navigate = useNavigate();
@@ -13,6 +13,7 @@ const UploadPostPage: React.FC = () => {
     formState: { errors },
     reset,
     watch,
+    setValue,
   } = useForm({
     defaultValues: {
       title: "",
@@ -26,6 +27,23 @@ const UploadPostPage: React.FC = () => {
   const watchedImageUrl = watch("imageUrl");
   const watchedContent = watch("content");
   const [error, setError] = useState("");
+  const [suggestionImageUrl, setSuggestionImageUrl] = useState<string | null>(
+    null
+  );
+
+  const {
+    data: suggestions,
+    refetch: fetchSuggestions,
+    isLoading,
+  } = useGetPostSuggestions(suggestionImageUrl);
+
+  useEffect(() => {
+    console.log(suggestions);
+    if (suggestions) {
+      setValue("title", suggestions["title"]);
+      setValue("content", suggestions["content"]);
+    }
+  }, [suggestions, setValue]);
 
   const previewPost = useMemo(() => {
     return {
@@ -50,6 +68,14 @@ const UploadPostPage: React.FC = () => {
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
       setError("Failed to upload post");
+    }
+  };
+
+  const handleAISuggestions = () => {
+    if (!watchedImageUrl) setError("Image URL is required");
+    else {
+      setSuggestionImageUrl(watchedImageUrl);
+      fetchSuggestions();
     }
   };
 
@@ -124,13 +150,22 @@ const UploadPostPage: React.FC = () => {
           <Button type="submit" variant="contained" disabled={isPending}>
             {isPending ? "Uploading..." : "Upload Post"}
           </Button>
+          {/* TODO - Add tooltip with explanation */}
+          <Button
+            type="button"
+            variant="contained"
+            disabled={isPending}
+            onClick={handleAISuggestions}
+          >
+            {isLoading ? "Uploading..." : "AI Suggestions"}
+          </Button>
         </Box>
         <Box sx={{ flex: 1, maxWidth: 400 }}>
           <Typography variant="h5" gutterBottom>
             Post Preview
           </Typography>
           <PostPreview
-            post={{ ...previewPost, _id: "previewId" }}
+            post={{ ...previewPost, _id: "", likes: 0 }}
             disabled={true}
           />
         </Box>
