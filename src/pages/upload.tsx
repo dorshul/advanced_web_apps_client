@@ -1,9 +1,11 @@
-import React, { useMemo, useState, useEffect } from "react";
-import { Box, Button, TextField, Typography, Stack } from "@mui/material";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
+import { Box, Button, TextField, Typography, Stack, IconButton, Checkbox, FormControlLabel } from "@mui/material";
+import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+
 import PostPreview from "../components/posts/post-preview";
-import { useCreatePost, useGetPostSuggestions } from "../hooks/posts";
+import { useCreatePost } from "../hooks/posts";
 
 const UploadPostPage: React.FC = () => {
   const navigate = useNavigate();
@@ -13,69 +15,42 @@ const UploadPostPage: React.FC = () => {
     formState: { errors },
     reset,
     watch,
-    setValue,
   } = useForm({
     defaultValues: {
-      title: "",
-      imageUrl: "",
-      content: "",
+      title: undefined,
+      content: undefined,
+      img: undefined,
     },
   });
 
   const { mutateAsync: createPost, isPending } = useCreatePost();
   const watchedTitle = watch("title");
-  const watchedImageUrl = watch("imageUrl");
   const watchedContent = watch("content");
   const [error, setError] = useState("");
-  const [suggestionImageUrl, setSuggestionImageUrl] = useState<string | null>(
-    null
-  );
 
-  const {
-    data: suggestions,
-    refetch: fetchSuggestions,
-    isLoading,
-  } = useGetPostSuggestions(suggestionImageUrl);
-
-  useEffect(() => {
-    console.log(suggestions);
-    if (suggestions) {
-      setValue("title", suggestions["title"]);
-      setValue("content", suggestions["content"]);
-    }
-  }, [suggestions, setValue]);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [useAISuggestion, setUseAISuggestion] = useState(true);
 
   const previewPost = useMemo(() => {
     return {
       title: watchedTitle || "Post Title",
       content: watchedContent || "Your post content will be previewed here.",
-      imageUrl:
-        watchedImageUrl ||
-        "https://via.placeholder.com/300x300?text=Image+Preview",
     };
-  }, [watchedTitle, watchedImageUrl, watchedContent]);
+  }, [watchedTitle, watchedContent]);
 
   const onSubmit = async (data: {
-    title: string;
-    imageUrl: string;
-    content: string;
+    title?: string;
+    img?: File;
+    content?: string;
   }) => {
     setError("");
     try {
-      await createPost(data);
+      await createPost({ post: { content: data.content, title: data.title }, img: data.img!, useAISuggestion });
       reset();
-      navigate("/posts");
+      navigate("/explore");
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
       setError("Failed to upload post");
-    }
-  };
-
-  const handleAISuggestions = () => {
-    if (!watchedImageUrl) setError("Image URL is required");
-    else {
-      setSuggestionImageUrl(watchedImageUrl);
-      fetchSuggestions();
     }
   };
 
@@ -102,6 +77,42 @@ const UploadPostPage: React.FC = () => {
             </Typography>
           )}
           <Controller
+            name="img"
+            control={control}
+            rules={{ required: "Image is required" }}
+            render={({ field: { onChange } }) => (
+              <div>
+                <input
+                  type="file"
+                  accept="image/jpeg, image/png"
+                  style={{ display: "none" }}
+                  id="image-upload"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      onChange(file);
+                      setPreview(URL.createObjectURL(file));
+                    }
+                  }}
+                />
+                <label htmlFor="image-upload">
+                  <IconButton component="span">
+                    <AddPhotoAlternateIcon/>
+                  </IconButton>
+                </label>
+              </div>
+            )}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox 
+                checked={useAISuggestion} 
+                onChange={(e) => setUseAISuggestion(e.target.checked)}
+              />
+            }
+            label="Use AI Suggestions"
+          />
+          {!useAISuggestion && <Controller
             name="title"
             control={control}
             rules={{ required: "Title is required" }}
@@ -115,24 +126,8 @@ const UploadPostPage: React.FC = () => {
                 helperText={errors.title ? errors.title.message : " "}
               />
             )}
-          />
-          {/* TODO - Add image upload with file*/}
-          <Controller
-            name="imageUrl"
-            control={control}
-            rules={{ required: "Image URL is required" }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Image URL"
-                variant="outlined"
-                fullWidth
-                error={!!errors.imageUrl}
-                helperText={errors.imageUrl ? errors.imageUrl.message : " "}
-              />
-            )}
-          />
-          <Controller
+          />}
+          {!useAISuggestion && <Controller
             name="content"
             control={control}
             rules={{ required: "Content is required" }}
@@ -147,25 +142,19 @@ const UploadPostPage: React.FC = () => {
                 helperText={errors.content ? errors.content.message : " "}
               />
             )}
-          />
-          <Button type="submit" variant="contained" disabled={isPending}>
-            {isPending ? "Uploading..." : "Upload Post"}
-          </Button>
-          <Button
-            type="button"
-            variant="contained"
-            disabled={isPending}
-            onClick={handleAISuggestions}
-          >
-            {isLoading ? "Uploading..." : "AI Suggestions"}
-          </Button>
+          />}
+          { isPending ? 
+            <Typography>Uploading...</Typography> 
+              : 
+            <Button type="submit" variant="contained" disabled={isPending}>Upload Post</Button> 
+          }
         </Box>
         <Box sx={{ flex: 1, maxWidth: 400 }}>
           <Typography variant="h5" gutterBottom>
             Post Preview
           </Typography>
           <PostPreview
-            post={{ ...previewPost, _id: "", likes: 0 }}
+            post={{ ...previewPost, imageUrl: preview || "", _id: "", likes: 0 }}
             disabled={true}
           />
         </Box>

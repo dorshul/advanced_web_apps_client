@@ -24,17 +24,17 @@ const PostPreview = ({ post, disabled = false }: PostPreviewProps) => {
   );
 
   const { title, content } = post;
-  const imageUrl = post.imageUrl || "https://picsum.photos/200/300";
+  const imageUrl = post.imageUrl || "";
   const navigate = useNavigate();
 
   return (
     <Card
-      sx={{ minWidth: 300, border: "1px solid rgb(163, 162, 165)", margin: 1 }}
+      sx={{ width: 350, border: "1px solid rgb(163, 162, 165)", margin: 1 }}
       onClick={() => (!disabled ? navigate(`/posts/${post?._id}`) : null)}
     >
       <CardMedia sx={{ height: 300, width: 300 }} image={imageUrl} />
       <CardContent>
-        <Typography gutterBottom variant="h5" component="div">
+        <Typography gutterBottom variant="h5" component="div" mt={1}>
           {title}
         </Typography>
         <Typography variant="body2" sx={{ color: "text.secondary" }}>

@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../services/axios";
 import Post from "../types/posts";
 import { useUser } from "./user";
+import { uploadImage } from "./files";
 
 export const fetchPosts = async (query: Partial<Post>): Promise<Post[]> => {
   const { data } = await axiosInstance.get("/api/posts", {
@@ -30,17 +31,13 @@ export const usePost = (id: string) => {
   });
 };
 
-export const createPost = async (post: Partial<Post>) => {
-  const { data } = await axiosInstance.post("/api/posts", post);
-  return data;
-};
-
-export const getImageSuggestion = async (imageUrl: string) => {
-  const { data } = await axiosInstance.post<Suggestions | undefined>(
-    "/api/posts/image",
-    { imageUrl }
-  );
-
+export const createPost = async (post: Partial<Post>, img: File) => {
+  const uploadImageData = await uploadImage(img);
+  const updatedPost = {
+    ...post,
+    imageUrl: uploadImageData.url,
+  };
+  const { data } = await axiosInstance.post("/api/posts", updatedPost);
   return data;
 };
 
@@ -50,20 +47,13 @@ export const useCreatePost = () => {
 
   return useMutation({
     mutationKey: ["createPost"],
-    mutationFn: (post: Partial<Post>) =>
-      createPost({ ...post, sender: user._id }),
-  });
-};
-interface Suggestions {
-  title: string;
-  content: string;
-}
-
-export const useGetPostSuggestions = (imageUrl: string | null) => {
-  return useQuery({
-    queryKey: ["postSuggestions", imageUrl],
-    queryFn: () =>
-      imageUrl ? getImageSuggestion(imageUrl) : Promise.resolve(undefined),
-    enabled: !!imageUrl,
+    mutationFn: ({
+      post,
+      img,
+    }: {
+      post: Partial<Post>;
+      img: File;
+      useAISuggestion?: boolean;
+    }) => createPost({ ...post, sender: user._id }, img),
   });
 };
