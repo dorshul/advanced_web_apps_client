@@ -8,6 +8,5 @@ export const PublicOnlyRoute = () => {
     return <div>Loading...</div>;
   }
 
-  console.log(user);
   return !user ? <Outlet /> : <Navigate to="/explore" replace />;
 };
