@@ -1,6 +1,7 @@
 import { Explore, ScreenLockPortrait, Upload } from "@mui/icons-material";
 import Stack from "@mui/material/Stack";
 import {
+  alpha,
   List,
   ListItem,
   ListItemButton,
@@ -40,10 +41,18 @@ export default function SideMenu() {
     <Stack
       sx={{
         width: sidebarWidth,
-        height: "100vh",
         backgroundColor: "background.paper",
         borderRight: "1px solid",
         borderColor: "divider",
+        overflowY: "auto",
+        bottom: 0,
+        "&::-webkit-scrollbar": {
+          width: "6px",
+        },
+        "&::-webkit-scrollbar-thumb": {
+          backgroundColor: (theme) => alpha(theme.palette.text.primary, 0.2),
+          borderRadius: "3px",
+        },
       }}
     >
       <List>

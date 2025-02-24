@@ -12,9 +12,12 @@ import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 
 import { useUser } from "../hooks/user";
+import { useAuth } from "../contexts/auth";
 
 const UserDetails: React.FC = () => {
   const { user, updateUser, isLoading } = useUser();
+  const { logout } = useAuth();
+
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({ name: "", email: "", _id: "" });
 
@@ -68,10 +71,7 @@ const UserDetails: React.FC = () => {
         </Typography>
       )}
       <Stack direction="row" justifyContent="center">
-        <IconButton
-          sx={{ margin: "10px" }}
-          onClick={() => alert("Logged out!")}
-        >
+        <IconButton sx={{ margin: "10px" }} onClick={() => logout()}>
           {/* TODO Navigate on logout */}
           <LogoutIcon color="warning" />
         </IconButton>

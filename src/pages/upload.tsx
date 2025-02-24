@@ -38,7 +38,6 @@ const UploadPostPage: React.FC = () => {
   } = useGetPostSuggestions(suggestionImageUrl);
 
   useEffect(() => {
-    console.log(suggestions);
     if (suggestions) {
       setValue("title", suggestions["title"]);
       setValue("content", suggestions["content"]);

@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios, { AxiosResponse } from "axios";
-
+import { AxiosResponse } from "axios";
 interface LoginCredentials {
   email: string;
   password: string;
@@ -13,10 +12,11 @@ interface RegisterCredentials extends LoginCredentials {
 }
 
 import { axiosInstance } from "../services/axios.ts";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export const useAuth = () => {
   const queryClient = useQueryClient();
+  const [isAuth, setIsAuth] = useState(false);
 
   useEffect(() => {
     const interceptor = axiosInstance.interceptors.response.use(
@@ -24,7 +24,7 @@ export const useAuth = () => {
       async (error) => {
         if (error.response?.status === 401) {
           try {
-            const { data } = await axios.post(
+            const { data } = await axiosInstance.post(
               "/api/auth/refresh",
               {},
               {
@@ -56,32 +56,54 @@ export const useAuth = () => {
       return data;
     },
     onSuccess: (data) => {
+      setIsAuth(true);
       queryClient.setQueryData(["user"], data.user);
     },
   });
   const registerMutation = useMutation({
     mutationFn: async (credentials: RegisterCredentials) => {
-      const { data } = await axios.post("/api/auth/register", credentials, {
-        withCredentials: true,
-      });
+      const { data } = await axiosInstance.post(
+        "/api/auth/register",
+        credentials,
+        {
+          withCredentials: true,
+        }
+      );
       return data;
     },
     onSuccess: (data) => {
+      setIsAuth(true);
       queryClient.setQueryData(["user"], data.user);
     },
   });
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      await axios.post("/api/auth/logout", {}, { withCredentials: true });
+      const response = await axiosInstance.post(
+        "/api/auth/logout",
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+      if (response.status === 204) {
+        axiosInstance.defaults.headers.common["Authorization"] = "";
+      }
+
+      return response;
     },
     onSuccess: () => {
+      setIsAuth(false);
       queryClient.setQueryData(["user"], null);
       queryClient.clear();
+    },
+    onError: (error) => {
+      console.error("Logout failed:", error);
     },
   });
 
   return {
+    isAuth,
     login: loginMutation.mutateAsync,
     register: registerMutation.mutateAsync,
     logout: logoutMutation.mutateAsync,
