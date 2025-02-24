@@ -13,6 +13,8 @@ import PostsView from "./pages/user-posts";
 import { Register } from "./pages/register";
 import ProfilePage from "./pages/profile";
 import UploadPostPage from "./pages/upload";
+import { PublicOnlyRoute } from "./components/router/public-route";
+import { ProtectedRoute } from "./components/router/protected-route";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -24,39 +26,49 @@ const router = createBrowserRouter([
     element: <Root />,
     children: [
       {
-        id: "profile",
-        path: "/profile",
-        element: <ProfilePage />,
+        element: <PublicOnlyRoute />,
+        children: [
+          {
+            path: "/login",
+            element: <Login />,
+          },
+          {
+            path: "/register",
+            element: <Register />,
+          },
+        ],
       },
+
       {
-        id: "login",
-        path: "/login",
-        element: <Login />,
-      },
-      {
-        id: "explore",
-        path: "/explore",
-        element: <ExplorePage />,
-      },
-      {
-        id: "posts",
-        path: "/posts",
-        element: <PostsView />,
-      },
-      {
-        id: "post-details",
-        path: "/posts/:id",
-        element: <PostsDetailsPage />,
-      },
-      {
-        id: "register",
-        path: "/register",
-        element: <Register />,
-      },
-      {
-        id: "upload",
-        path: "/upload",
-        element: <UploadPostPage />,
+        element: <ProtectedRoute />,
+        children: [
+          {
+            id: "profile",
+            path: "/profile",
+            element: <ProfilePage />,
+          },
+
+          {
+            id: "explore",
+            path: "/explore",
+            element: <ExplorePage />,
+          },
+          {
+            id: "posts",
+            path: "/posts",
+            element: <PostsView />,
+          },
+          {
+            id: "post-details",
+            path: "/posts/:id",
+            element: <PostsDetailsPage />,
+          },
+          {
+            id: "upload",
+            path: "/upload",
+            element: <UploadPostPage />,
+          },
+        ],
       },
     ],
   },

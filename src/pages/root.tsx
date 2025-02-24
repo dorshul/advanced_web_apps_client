@@ -6,7 +6,7 @@ import Header from "../components/header";
 
 export default function Root() {
   return (
-    <Stack direction="column" alignItems="stretch" sx={{ height: "100%" }}>
+    <Stack direction="column" display={"flex"} height={"100%"}>
       <AppNavbar />
       <Stack direction="row" flex={1}>
         {<SideMenu />}

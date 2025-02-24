@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance as axios } from "../services/axios";
 import { uploadImage } from "./files";
+import { useAuth } from "../contexts/auth";
 
 interface User {
   _id: string;
@@ -17,6 +18,7 @@ interface UpdateUserData {
 
 export const useUser = () => {
   const queryClient = useQueryClient();
+  const { isAuth } = useAuth();
 
   const {
     data: user,
@@ -28,6 +30,7 @@ export const useUser = () => {
       const { data } = await axios.get<User>("/api/users/me");
       return data;
     },
+    enabled: isAuth,
     retry: false,
   });
 

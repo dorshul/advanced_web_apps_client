@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance as axios } from "../services/axios";
+import { useUser } from "./user";
 
 export interface Comment {
   _id: string;
@@ -37,10 +38,11 @@ export const useComments = (postId: string) => {
 
 export const useAddComment = (postId: string) => {
   const queryClient = useQueryClient();
+  const { user } = useUser();
 
   return useMutation({
     mutationFn: (content: string) =>
-      addComment({ postId, content }, { email: "spam email" }),
+      addComment({ postId, content }, { email: user!.email }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
     },

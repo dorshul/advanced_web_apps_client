@@ -1,8 +1,17 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
-import { Box, Button, TextField, Typography, Stack, IconButton, Checkbox, FormControlLabel } from "@mui/material";
-import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Stack,
+  IconButton,
+  Checkbox,
+  FormControlLabel,
+} from "@mui/material";
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 
 import PostPreview from "../components/posts/post-preview";
 import { useCreatePost } from "../hooks/posts";
@@ -45,7 +54,11 @@ const UploadPostPage: React.FC = () => {
   }) => {
     setError("");
     try {
-      await createPost({ post: { content: data.content, title: data.title }, img: data.img!, useAISuggestion });
+      await createPost({
+        post: { content: data.content, title: data.title },
+        img: data.img!,
+        useAISuggestion,
+      });
       reset();
       navigate("/explore");
     } catch (err: unknown) {
@@ -97,7 +110,7 @@ const UploadPostPage: React.FC = () => {
                 />
                 <label htmlFor="image-upload">
                   <IconButton component="span">
-                    <AddPhotoAlternateIcon/>
+                    <AddPhotoAlternateIcon />
                   </IconButton>
                 </label>
               </div>
@@ -105,56 +118,67 @@ const UploadPostPage: React.FC = () => {
           />
           <FormControlLabel
             control={
-              <Checkbox 
-                checked={useAISuggestion} 
+              <Checkbox
+                checked={useAISuggestion}
                 onChange={(e) => setUseAISuggestion(e.target.checked)}
               />
             }
             label="Use AI Suggestions"
           />
-          {!useAISuggestion && <Controller
-            name="title"
-            control={control}
-            rules={{ required: "Title is required" }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Title"
-                variant="outlined"
-                fullWidth
-                error={!!errors.title}
-                helperText={errors.title ? errors.title.message : " "}
-              />
-            )}
-          />}
-          {!useAISuggestion && <Controller
-            name="content"
-            control={control}
-            rules={{ required: "Content is required" }}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Content"
-                variant="outlined"
-                fullWidth
-                rows={4}
-                error={!!errors.content}
-                helperText={errors.content ? errors.content.message : " "}
-              />
-            )}
-          />}
-          { isPending ? 
-            <Typography>Uploading...</Typography> 
-              : 
-            <Button type="submit" variant="contained" disabled={isPending}>Upload Post</Button> 
-          }
+          {!useAISuggestion && (
+            <Controller
+              name="title"
+              control={control}
+              rules={{ required: "Title is required" }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Title"
+                  variant="outlined"
+                  fullWidth
+                  error={!!errors.title}
+                  helperText={errors.title ? errors.title.message : " "}
+                />
+              )}
+            />
+          )}
+          {!useAISuggestion && (
+            <Controller
+              name="content"
+              control={control}
+              rules={{ required: "Content is required" }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Content"
+                  variant="outlined"
+                  fullWidth
+                  rows={4}
+                  error={!!errors.content}
+                  helperText={errors.content ? errors.content.message : " "}
+                />
+              )}
+            />
+          )}
+          {isPending ? (
+            <Typography>Uploading...</Typography>
+          ) : (
+            <Button type="submit" variant="contained" disabled={isPending}>
+              Upload Post
+            </Button>
+          )}
         </Box>
         <Box sx={{ flex: 1, maxWidth: 400 }}>
           <Typography variant="h5" gutterBottom>
             Post Preview
           </Typography>
           <PostPreview
-            post={{ ...previewPost, imageUrl: preview || "", _id: "", likes: 0 }}
+            post={{
+              ...previewPost,
+              imageUrl: preview || "",
+              _id: "",
+              likes: 0,
+            }}
             disabled={true}
           />
         </Box>
