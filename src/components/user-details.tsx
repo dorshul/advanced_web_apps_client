@@ -23,13 +23,12 @@ const UserDetails: React.FC = () => {
   const [editMode, setEditMode] = useState(false);
   const [error, setError] = useState("");
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const avatarUrl = editMode ? avatarPreview || user?.imageUrl : user?.imageUrl;
+  const avatarUrl = editMode ? avatarPreview || user?.avatarUrl : user?.avatarUrl;
 
   const {
     control,
     handleSubmit,
     formState: { errors },
-    reset,
   } = useForm({
     defaultValues: {
       name: user?.name,
@@ -46,7 +45,6 @@ const UserDetails: React.FC = () => {
     setError("");
     try {
       await updateUser(data);
-      reset();
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
       setError("Failed to upload post");
@@ -72,7 +70,7 @@ const UserDetails: React.FC = () => {
         }}
       />
       {editMode ? (
-        <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+        <Box component="form">
           {error && (
             <Typography color="error" variant="body2">
               {error}
@@ -81,7 +79,6 @@ const UserDetails: React.FC = () => {
           <Controller
             name="avatarUrl"
             control={control}
-            rules={{ required: "Image is required" }}
             render={({ field: { onChange } }) => (
               <div>
                 <input
@@ -127,7 +124,6 @@ const UserDetails: React.FC = () => {
       )}
       <Stack direction="row" justifyContent="center">
         <IconButton sx={{ margin: "10px" }} onClick={() => logout()}>
-          {/* TODO Navigate on logout */}
           <LogoutIcon color="warning" />
         </IconButton>
         {editMode ? (
