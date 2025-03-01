@@ -2,7 +2,6 @@ import { Box, alpha, Stack } from "@mui/material";
 import SideMenu from "../components/side-menu";
 import AppNavbar from "../components/app-navbar";
 import { Outlet } from "react-router-dom";
-import Header from "../components/header";
 
 export default function Root() {
   return (
@@ -30,7 +29,6 @@ export default function Root() {
               height: "100%",
             }}
           >
-            <Header />
             <Outlet />
           </Stack>
         </Box>
