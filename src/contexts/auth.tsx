@@ -124,9 +124,8 @@ export const useAuth = () => {
 
       return data;
     },
-    onSuccess: (data) => {
-      setIsAuth(true);
-      queryClient.setQueryData(["user"], data.user);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     },
   });
 
