@@ -89,6 +89,13 @@ export const Login = () => {
               )}
             </Button>
           </form>
+          <Button
+            color="primary"
+            onClick={() => navigate('/register')}
+            sx={{ marginTop: 2 }}
+          >
+            Don't have an account?
+          </Button>
         </Paper>
       </Box>
     </Container>

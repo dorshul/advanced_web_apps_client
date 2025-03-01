@@ -46,7 +46,7 @@ export const Register = () => {
         email: data.email,
         password: data.password,
       });
-      navigate("/explore");
+      navigate("/login");
     } catch (err) {
       console.error("Registration failed:", err);
     }

@@ -2,13 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance as axios } from "../services/axios";
 import { uploadImage } from "./files";
 import { useAuth } from "../contexts/auth";
-
-interface User {
-  _id: string;
-  email: string;
-  name: string;
-  imageUrl: string;
-}
+import { User } from "../types/user";
 
 interface UpdateUserData {
   _id?: string;
@@ -36,7 +30,9 @@ export const useUser = () => {
 
   const updateMutation = useMutation({
     mutationFn: async (updateData: UpdateUserData) => {
-      const { url } = await uploadImage(updateData.avatarUrl!);
+      const url = updateData.avatarUrl
+        ? (await uploadImage(updateData.avatarUrl)).url
+        : user?.avatarUrl;
       const { data } = await axios.put<User>(`/api/users/${user?._id}`, {
         ...updateData,
         avatarUrl: url,

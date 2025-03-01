@@ -9,12 +9,12 @@ import AppTheme from "./theme";
 import { Login } from "./pages/login";
 import ExplorePage from "./pages/explore";
 import PostsDetailsPage from "./pages/post-details";
-import PostsView from "./pages/user-posts";
 import { Register } from "./pages/register";
 import ProfilePage from "./pages/profile";
 import UploadPostPage from "./pages/upload";
 import { PublicOnlyRoute } from "./components/router/public-route";
 import { ProtectedRoute } from "./components/router/protected-route";
+import PostEditPage from "./pages/edit-post";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -54,9 +54,9 @@ const router = createBrowserRouter([
             element: <ExplorePage />,
           },
           {
-            id: "posts",
-            path: "/posts",
-            element: <PostsView />,
+            id: "edit-post",
+            path: "/posts/edit/:id",
+            element: <PostEditPage />,
           },
           {
             id: "post-details",
