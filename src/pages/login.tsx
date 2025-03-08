@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +12,9 @@ import {
   Container,
   Box,
   CircularProgress,
+  Stack,
 } from "@mui/material";
+import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -22,7 +25,8 @@ type LoginForm = z.infer<typeof loginSchema>;
 
 export const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const [error, setError] = useState("");
+  const { login, googleSignIn } = useAuth();
   const {
     register,
     handleSubmit,
@@ -36,7 +40,17 @@ export const Login = () => {
       await login(data);
       navigate("/explore");
     } catch (err) {
-      console.error("Login failed:", err);
+      setError("Failed to login");
+    }
+  };
+
+  const onSuccessGoogleSignIn = async (credentials: CredentialResponse) => {
+    try {
+      console.log("Google Sign In Success", credentials)
+      await googleSignIn(credentials);
+      navigate("/explore");
+    } catch (err) {
+      setError("Failed to login with Google");
     }
   };
 
@@ -74,7 +88,11 @@ export const Login = () => {
               error={!!errors.password}
               helperText={errors.password?.message}
             />
-
+            {error && (
+              <Typography color="error" variant="body2">
+                {error}
+              </Typography>
+            )}
             <Button
               type="submit"
               fullWidth
@@ -89,6 +107,11 @@ export const Login = () => {
               )}
             </Button>
           </form>
+          <Stack display={"flex"} alignItems={"center"} direction={"column"}>
+            <GoogleLogin
+              onSuccess={(credentials) => onSuccessGoogleSignIn(credentials)} 
+              onError={() => setError("Login Failed")} 
+              />
           <Button
             color="primary"
             onClick={() => navigate('/register')}
@@ -96,6 +119,7 @@ export const Login = () => {
           >
             Don't have an account?
           </Button>
+            </Stack>
         </Paper>
       </Box>
     </Container>
