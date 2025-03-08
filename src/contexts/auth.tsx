@@ -1,7 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
-import { axiosInstance } from "../services/axios.ts";
 import { useEffect, useState } from "react";
+import type { CredentialResponse } from "@react-oauth/google";
+
+import { axiosInstance } from "../services/axios.ts";
 
 interface LoginCredentials {
   email: string;
@@ -129,6 +131,25 @@ export const useAuth = () => {
     },
   });
 
+  const googleAuthMutation = useMutation({
+    mutationFn: async (credentials: CredentialResponse) => {
+      const { data } = await axiosInstance.post(
+        "/api/auth/google",
+        credentials
+      );
+
+      localStorage.setItem("refreshToken", data.refreshToken);
+      axiosInstance.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${data.accessToken}`;
+
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+    },
+  });
+
   const logoutMutation = useMutation({
     mutationFn: async () => {
       const refreshToken = localStorage.getItem("refreshToken");
@@ -160,6 +181,7 @@ export const useAuth = () => {
     login: loginMutation.mutateAsync,
     register: registerMutation.mutateAsync,
     logout: logoutMutation.mutateAsync,
+    googleSignIn: googleAuthMutation.mutateAsync,
     isLoading:
       isCheckingAuth ||
       loginMutation.isPending ||
